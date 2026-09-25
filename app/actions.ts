@@ -115,7 +115,7 @@ async function sendEmails(e: Enquiry) {
     html:
       `<div style="font-family:Arial,sans-serif;color:#262d2d">` +
       `<h2 style="color:#0e5151">Thanks, ${firstName}. Your request is in.</h2>` +
-      `<p>A ${site.name} travel expert will call you on <b>${escapeHtml(e.phone)}</b> ${site.callbackPromise} with fares for your trip.</p>` +
+      `<p>A ${site.name} travel expert will call you on <b>${escapeHtml(e.phone)}</b>  with fares for your trip.</p>` +
       tableHtml(rows) +
       `<p>Need us sooner? Call ${site.phoneDisplay}.</p></div>`,
   });
