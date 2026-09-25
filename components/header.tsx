@@ -5,6 +5,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { MobileNav } from "./mobile-nav";
+import { ModeToggle } from "./mode-toggle"; // ← new
 
 export function Header() {
   return (
@@ -28,6 +29,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ModeToggle /> {/* ← new: sun/moon button */}
           <a href={site.phoneHref} className={cn(buttonVariants(), "rounded-full")}>
             <Phone />
             <span className="hidden sm:inline">{site.phoneDisplay}</span>

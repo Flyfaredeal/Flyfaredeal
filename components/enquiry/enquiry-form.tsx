@@ -149,12 +149,12 @@ function TripForm({
         const formData = new FormData(e.currentTarget);
         startTransition(() => formAction(formData));
       }}
-      className="relative grid rounded-2xl bg-card text-card-foreground shadow-2xl shadow-teal-950/30 lg:grid-cols-[minmax(0,1fr)_16rem]"
+      className="relative grid text-card-foreground drop-shadow-[0_24px_40px_rgb(0_37_37/0.28)] lg:grid-cols-[minmax(0,1fr)_16rem]"
     >
       <input type="hidden" name="tripType" value={tripType} />
 
       {/* Honeypot: hidden from people and screen readers, bots fill it in */}
-      <div aria-hidden className="absolute -left-[9999px] size-px overflow-hidden">
+      <div aria-hidden className="absolute left-[-9999px] size-px overflow-hidden">
         <label>
           Company
           <input type="text" name="company" tabIndex={-1} autoComplete="off" />
@@ -162,7 +162,7 @@ function TripForm({
       </div>
 
       {/* ---------- Main panel ---------- */}
-      <div className="min-w-0 p-5 sm:p-7">
+      <div className="ticket-main min-w-0 rounded-t-2xl bg-card p-5 sm:p-7 lg:rounded-l-2xl lg:rounded-tr-none">
         {/* Step 1: the trip. Hidden (not removed) on step 2 so its values still get sent. */}
         <div hidden={step !== 1}>
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -276,9 +276,9 @@ function TripForm({
             <h2 className="text-xl font-bold text-primary">Where should we send your fares?</h2>
             <span className="text-xs text-muted-foreground">Step 2 of 2</span>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          {/* <p className="mt-1 text-sm text-muted-foreground">
             A travel expert checks fares across airlines and calls you back {site.callbackPromise}.
-          </p>
+          </p> */}
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <div className="grid gap-1.5">
@@ -347,13 +347,9 @@ function TripForm({
       {/* ---------- Ticket stub ---------- */}
       <div
         className={cn(
-          "relative flex flex-col justify-between gap-5 rounded-b-2xl border-t-2 border-dashed border-mist-200 bg-marigold-50 p-5 sm:p-7",
+          "ticket-stub relative flex flex-col justify-between gap-5 rounded-b-2xl border-t-2 border-dashed border-mist-200 bg-marigold-50 p-5 sm:p-7",
           "lg:rounded-r-2xl lg:rounded-bl-none lg:border-t-0 lg:border-l-2",
-          "dark:border-teal-700 dark:bg-teal-900",
-          // Half-circle notches where the tear line meets the edge
-          "before:absolute before:-top-3 before:-left-3 before:size-6 before:rounded-full before:bg-teal-800",
-          "after:absolute after:-top-3 after:-right-3 after:size-6 after:rounded-full after:bg-teal-800",
-          "lg:after:top-auto lg:after:right-auto lg:after:-bottom-3 lg:after:-left-3",
+          "dark:border-teal-600 dark:bg-teal-700",
         )}
       >
         <div>
@@ -413,7 +409,7 @@ function Success({ firstName, route, onReset }: { firstName: string; route: stri
       <h2 className="mt-4 text-2xl font-bold text-primary">Thanks, {firstName}. Your request is in.</h2>
       <p className="mt-2 max-w-prose text-muted-foreground">
         {route && <>We&apos;re checking fares for {route}. </>}
-        Keep your phone nearby: a travel expert will call you {site.callbackPromise}. We&apos;ve also emailed you a copy
+        Keep your phone nearby: a travel expert will call you. We&apos;ve also emailed you a copy
         of your request.
       </p>
       <div className="mt-6 flex flex-wrap items-center gap-3">

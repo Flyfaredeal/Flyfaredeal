@@ -6,11 +6,13 @@ import { Line } from "@react-three/drei";
 import * as THREE from "three";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
-// Brand colours (from globals.css)
-const TEAL_DOTS = "#a6c9c8"; // teal-300
-const TEAL_ARC = "#c9e0e0"; // teal-200
-const GLOBE_FILL = "#0a4a4a"; // a touch lighter than the hero's teal-800
-const MARIGOLD = "#f6b840"; // marigold-400
+// Brand colours (from globals.css) for a dark or a light hero background
+const palettes = {
+  dark: { dots: "#a6c9c8", arc: "#c9e0e0", fill: "#0a4a4a", fillOpacity: 0.85, gold: "#f6b840" },
+  light: { dots: "#387474", arc: "#387474", fill: "#ffffff", fillOpacity: 0.7, gold: "#ed9f00" },
+} as const;
+export type GlobeTone = keyof typeof palettes;
+type Palette = (typeof palettes)[GlobeTone];
 
 const RADIUS = 2;
 
@@ -77,7 +79,7 @@ function useArc(from: City, to: City) {
   }, [from, to]);
 }
 
-function Route({ from, to, offset, animate }: { from: City; to: City; offset: number; animate: boolean }) {
+function Route({ from, to, offset, animate, colors }: { from: City; to: City; offset: number; animate: boolean; colors: Palette }) {
   const { curve, points } = useArc(from, to);
   const plane = useRef<THREE.Mesh>(null);
 
@@ -89,16 +91,16 @@ function Route({ from, to, offset, animate }: { from: City; to: City; offset: nu
 
   return (
     <group>
-      <Line points={points} color={TEAL_ARC} lineWidth={1.2} dashed dashSize={0.06} gapSize={0.05} transparent opacity={0.7} />
+      <Line points={points} color={colors.arc} lineWidth={1.2} dashed dashSize={0.06} gapSize={0.05} transparent opacity={0.7} />
       <mesh ref={plane}>
         <sphereGeometry args={[0.035, 12, 12]} />
-        <meshBasicMaterial color={MARIGOLD} />
+        <meshBasicMaterial color={colors.gold} />
       </mesh>
     </group>
   );
 }
 
-function Globe({ animate }: { animate: boolean }) {
+function Globe({ animate, colors }: { animate: boolean; colors: Palette }) {
   const spin = useRef<THREE.Group>(null);
   const tilt = useRef<THREE.Group>(null);
   const pointer = useRef({ x: 0, y: 0 });
@@ -132,32 +134,32 @@ function Globe({ animate }: { animate: boolean }) {
       <group ref={spin} rotation={[0, -2.3, 0]}>
         <mesh>
           <sphereGeometry args={[RADIUS * 0.985, 64, 64]} />
-          <meshBasicMaterial color={GLOBE_FILL} transparent opacity={0.85} />
+          <meshBasicMaterial color={colors.fill} transparent opacity={colors.fillOpacity} />
         </mesh>
 
         <points>
           <bufferGeometry>
             <bufferAttribute attach="attributes-position" args={[dots, 3]} />
           </bufferGeometry>
-          <pointsMaterial color={TEAL_DOTS} size={0.028} sizeAttenuation transparent opacity={0.75} />
+          <pointsMaterial color={colors.dots} size={0.028} sizeAttenuation transparent opacity={0.75} />
         </points>
 
         {cityList.map(([lat, lon], i) => (
           <mesh key={i} position={toVector(lat, lon, RADIUS * 1.005)}>
             <sphereGeometry args={[0.03, 12, 12]} />
-            <meshBasicMaterial color={MARIGOLD} />
+            <meshBasicMaterial color={colors.gold} />
           </mesh>
         ))}
 
         {routes.map(([from, to], i) => (
-          <Route key={`${from}-${to}`} from={from} to={to} offset={i / routes.length} animate={animate} />
+          <Route key={`${from}-${to}`} from={from} to={to} offset={i / routes.length} animate={animate} colors={colors} />
         ))}
       </group>
     </group>
   );
 }
 
-export default function HeroGlobe() {
+export default function HeroGlobe({ tone = "dark" }: { tone?: GlobeTone }) {
   const wrapper = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(true);
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -178,7 +180,7 @@ export default function HeroGlobe() {
         frameloop={visible && !reduceMotion ? "always" : "demand"}
         style={{ pointerEvents: "none" }}
       >
-        <Globe animate={!reduceMotion} />
+        <Globe animate={!reduceMotion} colors={palettes[tone]} />
       </Canvas>
     </div>
   );

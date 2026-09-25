@@ -117,12 +117,12 @@
 .dark {
   --background: var(--color-teal-950);
   --foreground: var(--color-mist-50);
-
-  --card: #063030;
+ 
+    --card: #0d3f3f;
   --card-foreground: var(--color-mist-50);
 
-  --popover: #063030;
-  --popover-foreground: var(--color-mist-50);
+  --popover: #0d3f3f;
+   --popover-foreground: var(--color-mist-50);
 
   --primary: var(--color-teal-300);
   --primary-hover: var(--color-teal-200);
@@ -237,3 +237,68 @@
     @apply font-sans;
   }
 }
+/* ------------------------------------------------------------------ */
+/* Boarding-pass notches: half circles cut out where the tear line     */
+/* meets the card edge. Real holes, so any background shows through.    */
+/* ------------------------------------------------------------------ */
+@layer components {
+  .ticket-main,
+  .ticket-stub {
+    --notch: 12px;
+    mask-repeat: no-repeat;
+  }
+  /* Phone: main panel on top, stub below */
+  .ticket-main {
+    mask-image:
+      radial-gradient(circle var(--notch) at 0 100%, #0000 98%, #000),
+      radial-gradient(circle var(--notch) at 100% 100%, #0000 98%, #000);
+    mask-size: 50.5% 100%;
+    mask-position: left, right;
+  }
+  .ticket-stub {
+    mask-image:
+      radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000),
+      radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000);
+    mask-size: 50.5% 100%;
+    mask-position: left, right;
+  }
+  /* Desktop (lg): main panel on the left, stub on the right */
+  @media (width >= 64rem) {
+    .ticket-main {
+      mask-image:
+        radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000),
+        radial-gradient(circle var(--notch) at 100% 100%, #0000 98%, #000);
+      mask-size: 100% 50.5%;
+      mask-position: top, bottom;
+    }
+    .ticket-stub {
+      mask-image:
+        radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000),
+        radial-gradient(circle var(--notch) at 0 100%, #0000 98%, #000);
+      mask-size: 100% 50.5%;
+      mask-position: top, bottom;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Hero sky: daytime in light mode, night in dark mode                  */
+/* ------------------------------------------------------------------ */
+.hero-sky {
+  background:
+    radial-gradient(50rem 24rem at 15% 0%, rgb(255 255 255 / 0.6), transparent 70%),
+    linear-gradient(180deg, #b9dedd 0%, #dff0ef 55%, #fff4da 100%);
+}
+.dark .hero-sky {
+  background:
+    radial-gradient(42rem 30rem at 78% 72%, rgb(246 184 64 / 0.22), transparent 65%),
+    radial-gradient(90rem 22rem at 50% 120%, rgb(246 184 64 / 0.18), transparent 70%),
+    linear-gradient(180deg, #001818 0%, #002b2b 45%, #0a4444 100%);
+}
+
+@keyframes shooting-star {
+  0%, 88% { opacity: 0; transform: translate(0, 0) rotate(-18deg); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translate(22rem, 7rem) rotate(-18deg); }
+}
+ 
