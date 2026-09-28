@@ -1,3 +1,14 @@
+export type Review = {
+  name: string;
+  location?: string;
+  trip?: string;
+  rating: 1 | 2 | 3 | 4 | 5;
+  text: string;
+  date: string;
+  source?: string;
+  sample?: boolean;
+};
+
 export const reviews: Review[] = [
   {
     name: "Aarav M.",
@@ -36,26 +47,6 @@ export const reviews: Review[] = [
     rating: 5,
     text: "Found a convenient flight option for my trip to Chennai. The communication was clear and the booking was handled without any hassle.",
     date: "June 2026",
-    source: "Demo",
-    sample: true,
-  },
-  {
-    name: "Michael T.",
-    location: "Houston, TX",
-    trip: "Houston to Hyderabad",
-    rating: 5,
-    text: "Really liked how easy it was to compare the available options. The fare was competitive and everything was explained clearly before booking.",
-    date: "June 2026",
-    source: "Demo",
-    sample: true,
-  },
-  {
-    name: "Simran K.",
-    location: "San Francisco, CA",
-    trip: "San Francisco to Bengaluru",
-    rating: 5,
-    text: "Booked my trip without any unnecessary complications. The team was responsive and helped me understand the different flight options.",
-    date: "May 2026",
     source: "Demo",
     sample: true,
   },
