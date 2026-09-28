@@ -118,8 +118,9 @@ function TripForm({
   if (prefill !== seenPrefill) {
     setSeenPrefill(prefill);
     if (prefill) {
-      setFrom(findAirport(prefill.from) ?? null);
-      setTo(findAirport(prefill.to) ?? null);
+      // Only change the fields the prefill includes (trip cards send just "to")
+      if (prefill.from) setFrom(findAirport(prefill.from) ?? null);
+      if (prefill.to) setTo(findAirport(prefill.to) ?? null);
       setStep(1);
     }
   }

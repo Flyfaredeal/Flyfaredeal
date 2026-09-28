@@ -22,7 +22,7 @@ export function LegalPage({
       <Header />
       <main className="flex-1">
         <div className="border-b bg-teal-50 dark:bg-teal-950">
-          <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
@@ -37,7 +37,7 @@ export function LegalPage({
 
         <article
           className={[
-            "mx-auto max-w-3xl px-4 py-12 text-[0.95rem] leading-7 text-foreground/90 sm:px-6",
+            "mx-auto max-w-7xl px-4 py-12 text-[0.95rem] leading-7 text-foreground/90 sm:px-6",
             "[&_h2]:mt-10 [&_h2]:scroll-mt-20 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-primary [&_h2:first-child]:mt-0",
             "[&_p]:mt-3 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:space-y-1.5 [&_ul]:pl-5 [&_li]:marker:text-marigold-600",
             "[&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2",

@@ -62,6 +62,8 @@ export const airports: Airport[] = [
   { code: "SYD", city: "Sydney", name: "Sydney Kingsford Smith", country: "Australia" },
   { code: "MEL", city: "Melbourne", name: "Melbourne Airport", country: "Australia" },
   { code: "AKL", city: "Auckland", name: "Auckland Airport", country: "New Zealand" },
+  { code: "DPS", city: "Bali (Denpasar)", name: "Ngurah Rai International", country: "Indonesia" },
+  { code: "ZRH", city: "Zurich", name: "Zurich Airport", country: "Switzerland" },
 ];
 
 // Used by the combobox: does this airport match what the user typed?

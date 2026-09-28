@@ -1,7 +1,7 @@
 // A tiny "message" other parts of the page can send to the enquiry form.
 // Popular routes use it to fill in From and To.
 
-export type Prefill = { from: string; to: string };
+export type Prefill = { from?: string; to?: string };
 
 const EVENT = "ffd:prefill";
 
