@@ -4,12 +4,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Line } from "@react-three/drei";
 import * as THREE from "three";
+import { mesh } from "topojson-client";
+import type { GeometryCollection, Topology } from "topojson-specification";
+import countriesTopo from "world-atlas/countries-110m.json";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 // Brand colours (from globals.css) for a dark or a light hero background
 const palettes = {
-  dark: { dots: "#a6c9c8", arc: "#c9e0e0", fill: "#0a4a4a", fillOpacity: 0.85, gold: "#f6b840" },
-  light: { dots: "#387474", arc: "#387474", fill: "#ffffff", fillOpacity: 0.7, gold: "#ed9f00" },
+  dark: { outline: "#a6c9c8", arc: "#c9e0e0", fill: "#0a4a4a", fillOpacity: 0.85, gold: "#f6b840" },
+  light: { outline: "#387474", arc: "#387474", fill: "#ffffff", fillOpacity: 0.7, gold: "#ed9f00" },
 } as const;
 export type GlobeTone = keyof typeof palettes;
 type Palette = (typeof palettes)[GlobeTone];
@@ -42,6 +45,19 @@ const routes: [City, City][] = [
   ["DEL", "SYD"],
 ];
 
+// Countries outlined in gold, as named in world-atlas (Singapore is too small for the 110m map)
+const highlightedCountries = new Set([
+  "India",
+  "United States of America",
+  "Canada",
+  "United Kingdom",
+  "United Arab Emirates",
+  "Australia",
+]);
+
+// How much of the route the solid trail covers behind the plane (0–1)
+const TRAIL_LENGTH = 0.22;
+
 function toVector(lat: number, lon: number, r = RADIUS) {
   const phi = THREE.MathUtils.degToRad(90 - lat);
   const theta = THREE.MathUtils.degToRad(lon + 180);
@@ -52,19 +68,37 @@ function toVector(lat: number, lon: number, r = RADIUS) {
   );
 }
 
-// Evenly spread dots over a sphere (Fibonacci sphere)
-function useSphereDots(count: number) {
-  return useMemo(() => {
-    const positions = new Float32Array(count * 3);
-    const golden = Math.PI * (3 - Math.sqrt(5));
-    for (let i = 0; i < count; i++) {
-      const y = 1 - (i / (count - 1)) * 2;
-      const r = Math.sqrt(1 - y * y);
-      const a = golden * i;
-      positions.set([Math.cos(a) * r * RADIUS, y * RADIUS, Math.sin(a) * r * RADIUS], i * 3);
+// Turns [lon, lat] polylines into line-segment positions on the sphere
+function toSegments(lines: number[][][], r: number) {
+  const positions: number[] = [];
+  for (const line of lines) {
+    for (let i = 0; i < line.length - 1; i++) {
+      const [lon1, lat1] = line[i];
+      const [lon2, lat2] = line[i + 1];
+      if (Math.abs(lon2 - lon1) > 180) continue; // don't draw a chord across the date line
+      const a = toVector(lat1, lon1, r);
+      const b = toVector(lat2, lon2, r);
+      positions.push(a.x, a.y, a.z, b.x, b.y, b.z);
     }
-    return positions;
-  }, [count]);
+  }
+  return new Float32Array(positions);
+}
+
+// All borders + coastlines, and separately the outlines of the highlighted countries
+function useCountryOutlines() {
+  return useMemo(() => {
+    const topo = countriesTopo as unknown as Topology<{ countries: GeometryCollection<{ name: string }> }>;
+    const all = mesh(topo, topo.objects.countries);
+    const picked: GeometryCollection<{ name: string }> = {
+      type: "GeometryCollection",
+      geometries: topo.objects.countries.geometries.filter((g) => highlightedCountries.has(g.properties?.name ?? "")),
+    };
+    const highlighted = mesh(topo, picked);
+    return {
+      all: toSegments(all.coordinates, RADIUS * 1.002),
+      highlighted: toSegments(highlighted.coordinates, RADIUS * 1.004),
+    };
+  }, []);
 }
 
 // A curved flight path lifted above the surface
@@ -79,21 +113,52 @@ function useArc(from: City, to: City) {
   }, [from, to]);
 }
 
+type LineRef = { geometry: { setPositions: (positions: number[]) => void }; visible: boolean };
+
 function Route({ from, to, offset, animate, colors }: { from: City; to: City; offset: number; animate: boolean; colors: Palette }) {
   const { curve, points } = useArc(from, to);
   const plane = useRef<THREE.Mesh>(null);
+  const trail = useRef<LineRef>(null);
+  const trailPositions = useMemo(() => new Array<number>(), []);
+  const tmp = useMemo(() => new THREE.Vector3(), []);
 
   useFrame(({ clock }) => {
-    if (!plane.current) return;
     const t = animate ? (clock.elapsedTime * 0.08 + offset) % 1 : offset;
-    plane.current.position.copy(curve.getPoint(t));
+    plane.current?.position.copy(curve.getPoint(t));
+
+    // Solid trail from a bit behind the plane up to the plane
+    const line = trail.current;
+    if (!line) return;
+    const t0 = Math.max(0, t - TRAIL_LENGTH);
+    if (t - t0 < 0.005) {
+      line.visible = false;
+      return;
+    }
+    line.visible = true;
+    trailPositions.length = 0;
+    const steps = 24;
+    for (let i = 0; i <= steps; i++) {
+      curve.getPoint(t0 + ((t - t0) * i) / steps, tmp);
+      trailPositions.push(tmp.x, tmp.y, tmp.z);
+    }
+    line.geometry.setPositions(trailPositions);
   });
 
   return (
     <group>
-      <Line points={points} color={colors.arc} lineWidth={1.2} dashed dashSize={0.06} gapSize={0.05} transparent opacity={0.7} />
+      {/* Full route, faint and dashed */}
+      <Line points={points} color={colors.arc} lineWidth={1} dashed dashSize={0.06} gapSize={0.05} transparent opacity={0.35} />
+      {/* Solid highlighted trail behind the plane */}
+      <Line
+        ref={trail as never}
+        points={points.slice(0, 2)}
+        color={colors.gold}
+        lineWidth={2.2}
+        transparent
+        opacity={0.95}
+      />
       <mesh ref={plane}>
-        <sphereGeometry args={[0.035, 12, 12]} />
+        <sphereGeometry args={[0.04, 12, 12]} />
         <meshBasicMaterial color={colors.gold} />
       </mesh>
     </group>
@@ -104,7 +169,7 @@ function Globe({ animate, colors }: { animate: boolean; colors: Palette }) {
   const spin = useRef<THREE.Group>(null);
   const tilt = useRef<THREE.Group>(null);
   const pointer = useRef({ x: 0, y: 0 });
-  const dots = useSphereDots(2200);
+  const outlines = useCountryOutlines();
 
   // Track the mouse across the whole window (the canvas itself ignores clicks)
   useEffect(() => {
@@ -132,21 +197,32 @@ function Globe({ animate, colors }: { animate: boolean; colors: Palette }) {
     <group ref={tilt} rotation={[0.35, 0, 0]}>
       {/* Start with India and the Atlantic facing the viewer */}
       <group ref={spin} rotation={[0, -2.3, 0]}>
-        <mesh>
+        {/* Ocean. Drawn first and writes depth, so outlines on the far side stay hidden */}
+        <mesh renderOrder={0}>
           <sphereGeometry args={[RADIUS * 0.985, 64, 64]} />
           <meshBasicMaterial color={colors.fill} transparent opacity={colors.fillOpacity} />
         </mesh>
 
-        <points>
+        {/* All country outlines */}
+        <lineSegments renderOrder={1}>
           <bufferGeometry>
-            <bufferAttribute attach="attributes-position" args={[dots, 3]} />
+            <bufferAttribute attach="attributes-position" args={[outlines.all, 3]} />
           </bufferGeometry>
-          <pointsMaterial color={colors.dots} size={0.028} sizeAttenuation transparent opacity={0.75} />
-        </points>
+          <lineBasicMaterial color={colors.outline} transparent opacity={0.45} />
+        </lineSegments>
 
+        {/* Countries on our routes, in gold */}
+        <lineSegments renderOrder={2}>
+          <bufferGeometry>
+            <bufferAttribute attach="attributes-position" args={[outlines.highlighted, 3]} />
+          </bufferGeometry>
+          <lineBasicMaterial color={colors.gold} transparent opacity={0.9} />
+        </lineSegments>
+
+        {/* Airports */}
         {cityList.map(([lat, lon], i) => (
           <mesh key={i} position={toVector(lat, lon, RADIUS * 1.005)}>
-            <sphereGeometry args={[0.03, 12, 12]} />
+            <sphereGeometry args={[0.035, 12, 12]} />
             <meshBasicMaterial color={colors.gold} />
           </mesh>
         ))}

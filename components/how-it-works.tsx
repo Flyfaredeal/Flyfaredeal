@@ -1,9 +1,5 @@
-"use client";
-
-import { useRef, useState } from "react";
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { Plane } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { PlaneCursorSection } from "@/components/plane-cursor-section";
 
 const steps = [
   {
@@ -20,90 +16,12 @@ const steps = [
   },
 ];
 
-// lucide's Plane icon points up-right; +45° makes it point along the direction of travel.
-// If the nose ever looks off, this is the number to tweak.
-const PLANE_OFFSET = 45;
-
 export function HowItWorks() {
-  const reduce = useReducedMotion();
-  const [cursorOn, setCursorOn] = useState(false);
-  const [activeStep, setActiveStep] = useState<number | null>(null);
-  const last = useRef({ x: 0, y: 0 });
-
-  // Plane cursor position and heading, smoothed with springs
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const heading = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 600, damping: 40, mass: 0.4 });
-  const sy = useSpring(y, { stiffness: 600, damping: 40, mass: 0.4 });
-  const sHeading = useSpring(heading, { stiffness: 180, damping: 18 });
-  const rotate = useTransform(sHeading, (a) => a + PLANE_OFFSET);
-
-  function onPointerMove(e: React.PointerEvent<HTMLElement>) {
-    if (reduce || e.pointerType !== "mouse") return; // mouse only, no effect on touch
-    const rect = e.currentTarget.getBoundingClientRect();
-    const nx = e.clientX - rect.left;
-    const ny = e.clientY - rect.top;
-    const dx = nx - last.current.x;
-    const dy = ny - last.current.y;
-
-    // Turn the plane towards where the mouse is heading (ignore tiny jitters)
-    if (Math.hypot(dx, dy) > 3) {
-      const target = (Math.atan2(dy, dx) * 180) / Math.PI;
-      const current = heading.get();
-      const diff = ((((target - current) % 360) + 540) % 360) - 180; // shortest way round
-      heading.set(current + diff);
-    }
-
-    last.current = { x: nx, y: ny };
-    if (!cursorOn) {
-      // Jump straight to the mouse on entry instead of flying in from the corner
-      sx.jump(nx);
-      sy.jump(ny);
-      setCursorOn(true);
-    }
-    x.set(nx);
-    y.set(ny);
-  }
-
-  function onPointerLeave() {
-    setCursorOn(false);
-    setActiveStep(null);
-  }
-
   return (
-    <section
+    <PlaneCursorSection
       id="how-it-works"
-      onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
-      className={cn(
-        "relative scroll-mt-16 overflow-hidden bg-teal-50 py-16 sm:py-20 dark:bg-teal-900/40",
-        !reduce && "[@media(hover:hover)]:cursor-none",
-      )}
+      className="scroll-mt-16 bg-teal-50 py-16 sm:py-20 dark:bg-teal-900/40"
     >
-      {/* Plane cursor (mouse only) */}
-      {!reduce && (
-        <motion.div
-          aria-hidden
-          style={{ x: sx, y: sy }}
-          animate={{ opacity: cursorOn ? 1 : 0 }}
-          transition={{ duration: 0.2 }}
-          className="pointer-events-none absolute top-0 left-0 z-20 hidden [@media(hover:hover)]:block"
-        >
-          <motion.div
-            style={{ rotate }}
-            animate={{ scale: activeStep !== null ? 1.5 : 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 18 }}
-            className={cn(
-              "-mt-4 -ml-4 grid size-8 place-items-center rounded-full transition-colors duration-300",
-              activeStep !== null ? "bg-marigold-400 text-teal-950 shadow-lg shadow-marigold-500/30" : "bg-primary text-primary-foreground",
-            )}
-          >
-            <Plane className="size-4" />
-          </motion.div>
-        </motion.div>
-      )}
-
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <h2 className="text-2xl font-bold tracking-tight text-primary sm:text-3xl">How it works</h2>
 
@@ -111,8 +29,7 @@ export function HowItWorks() {
           {steps.map((step, i) => (
             <li
               key={step.title}
-              onPointerEnter={() => setActiveStep(i)}
-              onPointerLeave={() => setActiveStep(null)}
+              data-plane-hover
               className="group/step -m-4 rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:bg-white/70 hover:shadow-lg hover:shadow-teal-950/5 dark:hover:bg-teal-900/60"
             >
               <div className="flex items-center gap-4">
@@ -145,6 +62,6 @@ export function HowItWorks() {
           ))}
         </ol>
       </div>
-    </section>
+    </PlaneCursorSection>
   );
 }

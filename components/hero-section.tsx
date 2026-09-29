@@ -3,6 +3,7 @@ import { site } from "@/lib/site";
 import { EnquiryForm } from "./enquiry/enquiry-form";
 import { HeroBackground } from "./hero-background";
 import { HeroSky } from "./hero-sky";
+import { PlaneCursorSection } from "./plane-cursor-section";
 
 const promises = [
   { icon: Plane, text: "Fares across many airlines" },
@@ -12,7 +13,10 @@ const promises = [
 
 export function HeroSection() {
   return (
-    <section id="search" className="hero-sky relative scroll-mt-16 overflow-hidden text-teal-950 dark:text-white">
+    <PlaneCursorSection
+      id="search"
+      className="hero-sky scroll-mt-16 text-teal-950 dark:text-white"
+    >
       {/* Clouds (light) or stars (dark), then the globe */}
       <HeroSky />
       <HeroBackground />
@@ -20,10 +24,10 @@ export function HeroSection() {
       <div className="relative mx-auto max-w-6xl px-4 pt-14 pb-16 sm:px-6 sm:pt-20 sm:pb-24">
         <h1 className="max-w-2xl text-4xl font-extrabold tracking-tight text-balance sm:text-6xl">{site.tagline}</h1>
         <p className="mt-4 max-w-xl text-lg text-mist-700 dark:text-teal-100">
-          Tell us where you&apos;re headed. A travel expert finds your fare and calls you back .
+          Tell us where you&apos;re headed. A travel expert finds your fare and calls you back.
         </p>
 
-        <div className="mt-10">
+        <div className="mt-10" data-plane-off>
           <EnquiryForm />
         </div>
 
@@ -35,6 +39,6 @@ export function HeroSection() {
           ))}
         </ul>
       </div>
-    </section>
+    </PlaneCursorSection>
   );
 }
