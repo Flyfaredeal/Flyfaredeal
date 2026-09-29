@@ -4,7 +4,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
-
+import { WhatsAppButton } from "@/components/whatsapp-button";
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-sans", // globals.css reads this variable
   subsets: ["latin"],
@@ -32,6 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="flex min-h-full flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
+             <WhatsAppButton />
           <Toaster />
         </ThemeProvider>
       </body>

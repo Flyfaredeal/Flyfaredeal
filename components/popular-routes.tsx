@@ -3,7 +3,7 @@
 import { ArrowRight, PlaneTakeoff } from "lucide-react";
 import { findAirport } from "@/lib/airports";
 import { prefillEnquiry } from "@/lib/prefill";
-
+import { FlightPathBackground } from "./flight-pathbackground";
 // Big US departure cities, each with the Indian cities customers fly to most.
 // To add a city, add its airport code (it must exist in lib/airports.ts).
 const origins = ["JFK", "LAX", "ORD", "SFO", "DFW", "IAD"];
@@ -12,7 +12,9 @@ const destinations = ["DEL", "BOM", "MAA"];
 export function PopularRoutes() {
   return (
     <section id="routes" className="scroll-mt-16 py-16 sm:py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+        <FlightPathBackground className="absolute top-0 right-6 hidden h-36 w-72 lg:block" />
+
         <h2 className="text-2xl font-bold tracking-tight text-primary sm:text-3xl">Popular routes from the US to India</h2>
         <p className="mt-2 max-w-xl text-muted-foreground">
           Pick a route to start your request. You can change anything before you send it.

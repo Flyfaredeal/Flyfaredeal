@@ -1,7 +1,8 @@
-import { Phone } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { buttonVariants } from "@/components/ui/button";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { whatsappLink } from "@/lib/whatsapp";
 
 export function CallBand() {
   return (
@@ -13,8 +14,11 @@ export function CallBand() {
             Call a travel expert for fares, date changes or help planning a multi-city trip.
           </p>
         </div>
-        <a href={site.phoneHref} className={cn(buttonVariants({ variant: "cta" }), "h-14 gap-2.5 px-6 text-lg")}>
-          <Phone className="size-5" />
+        <a href={whatsappLink()} target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Chat on WhatsApp"
+          className={cn(buttonVariants({ variant: "cta" }), "h-14 gap-2.5 px-6 text-lg")}>
+          <FaWhatsapp size={30} className="text-teal-700" />
           {site.phoneDisplay}
         </a>
       </div>

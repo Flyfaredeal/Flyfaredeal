@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Phone } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { buttonVariants } from "@/components/ui/button";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -31,7 +31,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <ModeToggle /> {/* ← new: sun/moon button */}
           <a href={site.phoneHref} className={cn(buttonVariants(), "rounded-full")}>
-            <Phone />
+            <FaWhatsapp size={24} color="#25D366" />
             <span className="hidden sm:inline">{site.phoneDisplay}</span>
             <span className="sm:hidden">Call us</span>
           </a>
