@@ -91,7 +91,9 @@ function useCountryOutlines() {
     const all = mesh(topo, topo.objects.countries);
     const picked: GeometryCollection<{ name: string }> = {
       type: "GeometryCollection",
-      geometries: topo.objects.countries.geometries.filter((g) => highlightedCountries.has(g.properties?.name ?? "")),
+      geometries: topo.objects.countries.geometries.filter((g) =>
+        highlightedCountries.has((g.properties as { name?: string } | undefined)?.name ?? ""),
+      ),
     };
     const highlighted = mesh(topo, picked);
     return {
