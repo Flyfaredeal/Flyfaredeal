@@ -96,7 +96,7 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-2.5 text-sm">
             {site.nav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="text-muted-foreground transition hover:text-primary">
+                <Link href={item.href} className="text-muted-foreground hover:underline transition hover:text-primary">
                   {item.label}
                 </Link>
               </li>
@@ -110,7 +110,7 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-2.5 text-sm">
             {help.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="text-muted-foreground transition hover:text-primary">
+                <Link href={item.href} className="text-muted-foreground hover:underline transition hover:text-primary">
                   {item.label}
                 </Link>
               </li>
