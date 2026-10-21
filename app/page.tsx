@@ -6,6 +6,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { PopularRoutes } from "@/components/popular-routes";
 import { ReviewsSection } from "@/components/reviews-section";
 import { TripsSection } from "@/components/trips-section";
+
+import { FlightsMarquee } from "@/components/flights-marquee"; // adjust path
 export default function Home() {
   return (
     <>
@@ -14,6 +16,8 @@ export default function Home() {
         <HeroSection />
         <PopularRoutes />
         <HowItWorks />
+
+        <FlightsMarquee />
         <TripsSection />
         <ReviewsSection />
         <CallBand />

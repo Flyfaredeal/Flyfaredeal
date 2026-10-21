@@ -301,4 +301,12 @@
   90% { opacity: 1; }
   100% { opacity: 0; transform: translate(22rem, 7rem) rotate(-18deg); }
 }
- 
+ @theme {
+  --animate-marquee: marquee 45s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
